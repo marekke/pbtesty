@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cut">
+<meta name="theme-color" content="#1f3b2d">
+<title>Patent Strzelecki – Testy</title>
+<style>
+:root {
+  --bg: #f3f4f1;
+  --surface: #ffffff;
+  --surface-2: #f7f8f5;
+  --text: #1b1f1c;
+  --muted: #5f6862;
+  --border: #d9ddd6;
+  --accent: #2f5d45;
+  --accent-text: #ffffff;
+  --accent-soft: #e3ece6;
+  --ok: #1f8a4c;
+  --ok-bg: #e2f5e9;
+  --bad: #c62f2f;
+  --bad-bg: #fbe5e3;
+  --sel: #2f5d9e;
+  --sel-bg: #e4ecf8;
+  --shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121513;
+    --surface: #1b1f1c;
+    --surface-2: #222723;
+    --text: #e8ebe8;
+    --muted: #9aa49d;
+    --border: #333a35;
+    --accent: #6fb08b;
+    --accent-text: #0f1a14;
+    --accent-soft: #23312a;
+    --ok: #4cc47f;
+    --ok-bg: #173323;
+    --bad: #f06a62;
+    --bad-bg: #3a1c1b;
+    --sel: #7aa5e6;
+    --sel-bg: #1e2a3d;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 16px calc(96px + env(safe-area-inset-bottom));
+}
+header.top {
+  position: sticky; top: 0; z-index: 5;
+  background: var(--bg);
+  padding: 12px 0 10px;
+  display: flex; align-items: center; gap: 12px;
+}
+header.top h1 { font-size: 17px; margin: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.icon-btn {
+  border: 1px solid var(--border); background: var(--surface);
+  border-radius: 10px; padding: 8px 12px; font-size: 14px;
+}
+.counter { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.progress { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 16px; }
+.progress > div { height: 100%; background: var(--accent); width: 0; transition: width .25s; }
+
+/* menu */
+.hero { padding: 28px 0 8px; }
+.hero h1 { font-size: 28px; line-height: 1.2; margin: 0 0 6px; }
+.hero p { margin: 0; color: var(--muted); }
+.modes { display: grid; gap: 12px; margin-top: 24px; }
+.mode {
+  text-align: left; border: 1px solid var(--border); background: var(--surface);
+  border-radius: 14px; padding: 18px; box-shadow: var(--shadow);
+  display: flex; gap: 14px; align-items: flex-start;
+  transition: transform .1s, border-color .15s;
+}
+.mode:hover { border-color: var(--accent); }
+.mode:active { transform: scale(.99); }
+.mode .ico {
+  flex: none; width: 44px; height: 44px; border-radius: 12px;
+  background: var(--accent-soft); color: var(--accent);
+  display: grid; place-items: center;
+}
+.mode .ico svg { width: 24px; height: 24px; }
+.mode b { display: block; font-size: 17px; margin-bottom: 2px; }
+.mode span { color: var(--muted); font-size: 14px; }
+.mode .resume { display: block; color: var(--accent); font-size: 13px; margin-top: 6px; font-weight: 600; }
+.foot { margin-top: 28px; color: var(--muted); font-size: 13px; text-align: center; }
+
+/* pytanie */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px; box-shadow: var(--shadow);
+}
+.qmeta { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.qtext { font-size: 18px; font-weight: 600; line-height: 1.45; margin: 0 0 18px; }
+.answers { display: grid; gap: 10px; }
+.ans {
+  display: flex; gap: 12px; align-items: flex-start; text-align: left;
+  width: 100%; padding: 14px; border-radius: 12px;
+  border: 2px solid var(--border); background: var(--surface-2);
+  transition: border-color .15s, background .15s;
+}
+.ans:hover:not(:disabled) { border-color: var(--accent); }
+.ans:disabled { cursor: default; }
+.ans .letter {
+  flex: none; width: 30px; height: 30px; border-radius: 8px;
+  display: grid; place-items: center; font-weight: 700; font-size: 15px;
+  background: var(--surface); border: 1px solid var(--border);
+}
+.ans .txt { padding-top: 3px; }
+.ans.sel { border-color: var(--sel); background: var(--sel-bg); }
+.ans.sel .letter { background: var(--sel); color: #fff; border-color: var(--sel); }
+.ans.ok { border-color: var(--ok); background: var(--ok-bg); }
+.ans.ok .letter { background: var(--ok); color: #fff; border-color: var(--ok); }
+.ans.bad { border-color: var(--bad); background: var(--bad-bg); }
+.ans.bad .letter { background: var(--bad); color: #fff; border-color: var(--bad); }
+.ans.dim { opacity: .55; }
+.verdict { margin-top: 14px; font-weight: 600; min-height: 1.5em; }
+.verdict.ok { color: var(--ok); }
+.verdict.bad { color: var(--bad); }
+
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+}
+.bar .in { max-width: 720px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+.btn {
+  border: 1px solid var(--border); background: var(--surface);
+  border-radius: 12px; padding: 13px 18px; font-weight: 600;
+}
+.btn.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); flex: 1; }
+.btn:disabled { opacity: .45; cursor: default; }
+.stat { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stat b.ok { color: var(--ok); } .stat b.bad { color: var(--bad); }
+
+/* wynik */
+.result { text-align: center; padding: 28px 20px; }
+.result .big { font-size: 56px; font-weight: 800; line-height: 1; margin: 8px 0; font-variant-numeric: tabular-nums; }
+.result .big.ok { color: var(--ok); } .result .big.bad { color: var(--bad); }
+.result p { color: var(--muted); margin: 6px 0 0; }
+.review { display: grid; gap: 12px; margin-top: 20px; }
+.review h2 { font-size: 16px; margin: 12px 0 0; }
+.review .card { padding: 16px; }
+.review .qtext { font-size: 16px; margin-bottom: 12px; }
+.review .ans { padding: 10px 12px; }
+.tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-left: 6px; vertical-align: 1px; }
+.tag.ok { background: var(--ok-bg); color: var(--ok); }
+.tag.bad { background: var(--bad-bg); color: var(--bad); }
+.picker { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+.picker select { font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+.hidden { display: none !important; }
+kbd { font: 12px ui-monospace, monospace; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
+@media (min-width: 640px) {
+  .qtext { font-size: 20px; }
+  .card { padding: 28px; }
+}
+@media (hover: none) { .kbd-hint { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="bar hidden" id="bar"><div class="in" id="barIn"></div></div>
+
+<script>
+const DATA = {"questions":[{"q":"Właściwy organ Policji cofa pozwolenie na broń, jeżeli osoba, której takie pozwolenie wydano:","a":["przewozi broń środkami transportu publicznego;","nie przestrzega obowiązku zawiadamiania właściwego organu Policji o zmianie miejsca zamieszkania w terminie 14 dni od dnia jego zmiany;","nosi broń, znajdując się w stanie po użyciu alkoholu, środka odurzającego;"],"c":2},{"q":"Bron zakupiona na podstawie zaswiadczenia uprawniajacego do nabycia broni nalezy zarejestrowac w ciagu:","a":["3 dni od daty zakupu;","7 dni od daty zakupu;","5 dni od daty zakupu;"],"c":2},{"q":"Która z poniższych czynności jest na strzelnicy bezwzględnie zabroniona?","a":["Korzystanie z broni innych użytkowników za ich zgodą;","Spożywanie alkoholu;","Ładowanie broni po komendzie \"ŁADUJ\""],"c":1},{"q":"Czy prowadzący strzelanie może usunąć ze strzelnicy osobę nie stosującą się do jego poleceń:","a":["tak;","nie;","tak, ale tylko w przypadku gdy jest to osoba strzelająca;"],"c":0},{"q":"Maksymalna waga karabinu pneumatycznego dopuszczonego do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) wynosi:","a":["5,5 kg;","8 kg;","6,5 kg;"],"c":0},{"q":"Amunicja uzywana do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) moze byc m.in. :","a":["amunicja dowolnego kalibru typu magnum lub inna amunicja dużej mocy;","amunicja kal. 7,62 mm (.30'') - 9,65 mm (.38'') z pociskami wykonanymi z ołowiu lub podobnego miękkiego materiału;","nie istnieją ograniczenia dotyczące amunicji używanej w konkurencjach ISSF;"],"c":1},{"q":"Podczas zawodów rozgrywanych według przepisów Miedzynarodowej Federacji Sportu Strzeleckiego (ISSF) na odleglosc 25 metrów rozgrywa się konkurencję:","a":["Pistolet dowolny;","Pistolet pneumatyczny;","Pistolet sportowy;"],"c":2},{"q":"Czy w konkurencji Pistolet sportowy 25 m można strzelać z rewolweru?:","a":["nie można;","tylko za zgodą prowadzącego strzelanie;","można, pod warunkiem zachowania regulaminowych ograniczeń dotyczących danej broni;"],"c":2},{"q":"Kto bez wymaganego zezwolenia wyrabia bron palna albo amunicje lub nia handluje, podlega karze:","a":["pozbawienia wolności od roku do lat 10;","pozbawienia wolności do roku;","aresztu;"],"c":0},{"q":"Kto posiadajac pozwolenie na bron lub posiadajac bron podlegajaca rejestracji, która nie wymaga pozwolenia na bron, nie dopelnia obowiazku pisemnego zawiadomienia wlasciwego organu Policji o zmianie miejsca stalego pobytu w terminie 14 dni od dnia zmiany miejsca stalego pobytu podlega:","a":["karze aresztu lub grzywny;","tylko karze grzywny;","tylko karze aresztu;"],"c":0},{"q":"Osoby posiadajace bron palna, sa zobowiazane do :","a":["przechowywania broni zgodnie z wymaganiami jej producenta;","przechowywania broni w szafach stalowych lub sejfach posiadających zamki atestowane;","przechowywanie broni w urządzeniach spełniających wymagania conajmniej klasy S1 według normy PN-EN 14450"],"c":2},{"q":"Która z niżej wymienionych odpowiedzi stanowi definicję broni palnej:","a":["urządzenie, które w wyniku działania sprężonych gazów, powstających na skutek spalania materiału miotającego może razić cele na odległość;","każda przenośna broń lufowa, która miota, jest przeznaczona do miotania lub może być przystosowana do miotania jednego lub większej liczby pocisków lub substancji w wyniku działania materiału miotającego;","urządzenie, które w wyniku działania sprężonych gazów, powstających na skutek spalania materiału miotającego, jest zdolne do wystrzeliwania pocisku i rażenia celów na odległość;"],"c":1},{"q":"Jakie czynnosci nalezy wykonac po komendzie \"ROZLADUJ!\"?","a":["rozładować broń, zabezpieczyć ją i umieścić na stanowisku strzeleckim;","rozładować i schować broń;","wyjąć magazynek i trzymać broń w pozycji \"gotów\";"],"c":0},{"q":"Po jakiej komendzie nalezy zaladowac magazynek nabojami, nastepnie wlozyc go do broni, wprowadzic pierwszy nabój do komory nabojowej i czekac na nastepne komendy prowadzacego strzelanie?","a":["Rozładuj;","Stop;","Ładuj;"],"c":2},{"q":"Do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) zabronione jest uzywanie m.in.:","a":["amunicji bocznego zapłonu typu \"long rifle\";","amunicji o dużej mocy i typu magnum;","śrutu kal. 4,5 mm (.177'') o dowolnym kształcie wykonanego z ołowiu lub innego miękkiego materiału;"],"c":1},{"q":"Minimalny opór jezyka spustowego w pistolecie sportowym dopuszczonym do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) wynosi:","a":["500 g.;","1360 g.;","1000 g.;"],"c":2},{"q":"Strzelectwo sportowe składa się z następujących dyscyplin:","a":["strzelanie z pistoletu, strzelanie z karabinu, strzelanie ze strzelby gładkolufowej","strzelanie z broni krótkiej, strzelanie z broni długiej, strzelanie do ruchomej tarczy;","strzelanie z broni krótkiej, strzelanie z broni długiej, strzelanie do ruchomej tarczy, strzelanie do rzutków;"],"c":0},{"q":"W strzelectwie sportowym konkurencja SKEET to strzelanie do rzutków:","a":["wyrzucanych z dwóch budek (wysokiej i niskiej);","wyrzucanych ze schronu znajdującego się w odległości 15 m od linii stanowisk strzeleckich;","wyrzucanych z linii stanowisk strzeleckich;"],"c":0},{"q":"Kto porzuca bron palna lub amunicje do niej, która pozostaje w jego dyspozycji podlega:","a":["wyłącznie karze grzywny;","grzywnie, karze ograniczenia wolności albo pozbawienia wolności do 2 lat;","wyłącznie karze ograniczenia wolności albo pozbawienia wolności do 2 lat;"],"c":1},{"q":"W stosunku do osoby, która nie dopelnila obowiazku rejestracji broni albo obowiazku zdania broni do depozytu mozna zastosowac:","a":["tylko karę aresztu;","karę aresztu lub grzywny;","tylko karę grzywny;"],"c":1},{"q":"Wlasciwy organ Policji cofa pozwolenie na bron, jezeli osoba, której pozwolenie takie wydano:","a":["naruszyła obowiązek rejestracji broni;","naruszyła obowiązek zawiadomienia o utracie broni;","naruszyła obowiązek dotyczący noszenia oraz przechowywania broni;"],"c":1},{"q":"Pozwolenie na broń wydane do celów sportowych uprawnia do posiadania broni palnej:","a":["gładkolufowej;","pistoletów sygnałowych;","broni alarmowej w postaci rewolwerów centralnego zapłonu o kalibrach od 6 mm do 12 mm;"],"c":0},{"q":"Jakie dane korzystajacego ze strzelnicy musza znalezc sie w ksiazce rejestru pobytu na strzelnicy?","a":["Wyłącznei imię i nazwisko;","Rozporządzenie o ochronie danych osobowych (RODO) nie zezwala na podawanie żadnych danych poza oświadczeniem o zapoznaniu się z regulaminem strzelnicy i przepisami bezpieczeństwa;","imię, nazwisko, numer pozwolenia na broń oraz nazwę organu, który je wydał albo adres korzystającego ze strzelnicy jeśli nie posiada pozwolenia na broń oraz oświadczenie o zapoznaniu się z regulaminem strzelnicy i przepisami bezpieczeństwa, potwierdzone własnoręcznym podpisem;"],"c":2},{"q":"Czy na strzelnicy wolno osobom towarzyszącym osobom korzystającym ze strzelnicy, wchodzić na stanowiska strzeleckie:","a":["nie;","tak;","wolno, ale tylko za zgodą osoby korzystającej ze strzelnicy;"],"c":0},{"q":"Minimalny opór jezyka spustowego w pistolecie pneumatycznym dopuszczonym do konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) wynosi:","a":["1000 g.","500 g.","750 g."],"c":1},{"q":"Amunicja centralnego zapłonu jest to:","a":["amunicja, w której masa zapłonowa znajduje się w środku dna łuski;","amunicja, w której masa zapłonowa wprasowana jest bezpośrednio w kryzę łuski;","każda amunicja o kalibrze większym niż 5,6 mm;"],"c":0},{"q":"Podczas zawodów rozgrywanych wedlug przepisów Miedzynarodowej Federacji Sportu Strzeleckiego (ISSF) na odleglosc 10 metrów rozgrywa sie konkurencje:","a":["Pistolet dowolny;","Karabin pneumatyczny;","Pistolet centralnego zapłonu;"],"c":1},{"q":"Które z niżej wymienionych konkurencji zaliczane są do dyscypliny strzelań ze strzelby gładkolufowej:","a":["skeet, trap, rogacz, dzik;","skeet, trap, double trap, automatic trap;","double trap, ruchoma tarcza, zając;"],"c":1},{"q":"Obrona konieczna to działanie wyłącznie w celu:","a":["odparcia bezpośredniego, bezprawnego zamachu na jakiegokolwiek dobro chronione prawem;","odparcia bezprawnego zamachu na dobro chronione prawem;","uchylenia bezpośredniego niebezpieczeństwa grożącego dobru chronionemu prawem;"],"c":0},{"q":"Kto nosi bron, naruszajac ograniczenie lub wykluczenie mozliwosci jej noszenia okreslone przez wlasciwy organ Policji w pozwoleniu na bron, albo nosi bron, naruszajac zakaz jej noszenia wprowadzony przez ministra wlasciwego do spraw wewnetrznych podlega karze:","a":["karze ograniczenia wolności;","pozbawienia wolności do lat 2;","aresztu lub grzywny;"],"c":2},{"q":"Czy organy Policji mają prawo zobowiązać posiadacza pozwolenia na broń, poddaniu się badaniom lekarskim i psychologicznym:","a":["tylko w przypadku, gdy istnieje uzasadnione podejrzenie, że osoba taka wykazuje istotne zaburzenia funkcjonowania psychologicznego, uzależnienie od alkoholu lub substancji psychoaktywnych, ograniczoną sprawność psychofizyczną oraz zaburzenia psychiczne, o których mowa w ustawie o ochronie zdrowia psychicznego;","nie;","tylko w przypadku, gdy osoba taka uzależniona jest od alkoholu i wykazuje zaburzenia funkcjonowania psychologicznego;"],"c":0},{"q":"Od egzaminu przed komisja powolana przez wlasciwy organ Policji ze znajomosci przepisów dotyczacych posiadania i uzywania danej broni oraz umiejetnosci poslugiwania sie ta bronia zwolnieni sa:","a":["wyłącznie funkcjonariusze państwowych formacji uzbrojonych i żołnierze Sił Zbrojnych RP;","nikt nie jest zwolniony z takiego egzaminu;","m.in. członkowie Polskiego Związku Strzelectwa Sportowego posiadający licencję zezwalającą na uprawianie strzelectwa sportowego - w zakresie broni sportowej, jeżeli zdali taki egzamin na podstawie odrębnych przepisów;"],"c":2},{"q":"Składanie się, celowanie i strzelanie \"na sucho\" dozwolone jest:","a":["w dowolnym miejscu, przy zachowaniu warunków bezpieczeństwa;","na stanowisku treningowym lub strzeleckim lub w innym miejscu do tego wyznaczonym za zgodą prowadzącego strzelanie ;","jest bezwzględnie zabronione;"],"c":1},{"q":"Czy dozwolone jest strzelanie na strzelnicy do innych przedmiotów niz cele strzeleckie oraz celowanie do ludzi, zwierzat i ptactwa?","a":["Tak, pod warunkiem wyrażenia na to zgody przez prowadzącego strzelanie;","Nie;","Tak, jednak tylko z broni pneumatycznej;"],"c":1},{"q":"Pistolet sportowy dopuszczony do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) musi zmiescic sie w pudelko o wewnetrznych wymiarach:","a":["300 mm x 150 mm x 50 mm;","450 mm x 250 mm x 75 mm;","200 mm x 100 mm x 25 mm;"],"c":0},{"q":"Bronia o najwiekszej srednicy przewodu lufu wyrazonym w kalibrze wagomiarowym jest bron o kalibrze:","a":["16","12","20"],"c":1},{"q":"Podczas zawodów rozgrywanych według przepisów Miedzynarodowej Federacji Sportu Strzeleckiego (ISSF) na odleglosc 50 metrów rozgrywa się konkurencję:","a":["Pistolet dowolny;","Pistolet szybkostrzelny;","Pistolet pneumatyczny;"],"c":0},{"q":"Iloma nabojami ładowany jest pistolet dowolny w czasie zawodów strzeleckich:","a":["5 nabojami;","w zależności od regulaminu zawodów;","1 nabojem;"],"c":2},{"q":"Kto uzywa w celach szkoleniowych lub sportowych broni zdolnej do razenia celów na odleglosc poza strzelnicami podlega karze:","a":["wyłącznie aresztu;","karze pozbawienia wolności do lat 2;","aresztu lub grzywny;"],"c":2},{"q":"Kto bez wymaganego zezwolenia posiada bron palna lub amunicje, podlega karze:","a":["pozbawienia wolności do lat 5;","grzywny;","pozbawienia wolności od 6 miesięcy do lat 8;"],"c":2},{"q":"Pozwolenia na bron nie wymaga sie w przypadku:","a":["posiadania broni palnej odziedziczonej po krewnym wstępnym;","posiadania broni do celów kolekcjonerskich;","używania broni w celach sportowych na strzelnicy działającej na podstawie zezwolenia własciwego organu;"],"c":2},{"q":"Amunicja sa wylacznie:","a":["naboje scalone przeznaczone do strzelania z broni palnej;","naboje przeznaczone do strzelania z broni palnej;","naboje przeznaczone do strzelania z broni palnej i broni pneumatycznej;"],"c":1},{"q":"Na strzelnicy zwierzęta:","a":["obowiązkowo powinny być trzymane na uwięzi i pod ścisłym nadzorem opiekuna;","obowiązkowo powinny być trzymane na uwięzi, pod nadzorem każdej osoby, wyznaczonej przez opiekuna;","nie mogą przebywać;"],"c":0},{"q":"Kiedy i w jaki sposób w czasie trwania konkurencji można odłożyć broń:","a":["w czasie obserwacji tarczy przez lunetę, kładąc załadowaną broń z lufą skierowaną w kierunku tarczy;","w czasie trwania odpoczynków, za każdym razem kładąc załadowaną broń ostrożnie na stoliku lub półce, z lufą skierowaną w bezpiecznym kierunku;","tylko po wyjęciu magazynka i po wyjęciu naboju z komory nabojowej, z lufą skierowaną w stronę kulochwytu;"],"c":2},{"q":"Maksymalna waga pistoletu dowolnego dopuszczonego do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) wynosi:","a":["1500 g;","jest dowolna;","1000 g;"],"c":1},{"q":"Kaliber wagomiarowy okresla:","a":["średnicę pocisku wyrażoną w setnych częściach cala angielskiego;","wagę naboju;","liczbę kul o średnicy przewodu lufy, jaką można odlać z ołowiu o masie jednego funta angielskiego (453,6 g);"],"c":2},{"q":"Podczas zawodów rozgrywanych według przepisów Miedzynarodowej Federacji Sportu Strzeleckiego (ISSF) na odleglosc 50 metrów rozgrywa się konkurencję:","a":["Pistolet pneumatyczny 40 strzałów;","Pistolet szybkostrzelny 2x30 strzałów;","Karabin 60 strzałów leżąc;"],"c":2},{"q":"Pistolet szybkostrzelny wg przepisów ISSF jest to konkurencja polegajaca na strzelaniu do 5 tarcz oddalonych od zawodnika o:","a":["25 metrów;","10 metrów;","50 metrów;"],"c":0},{"q":"Kto bez wymaganej rejestracji posiada bron pneumatyczna albo zbywa osobie nieuprawnionej bron pneumatyczna albo miotacz gazu obezwladniajacego lub narzedzie albo urzadzenie, którego uzywanie moze zagrazac zyciu lub zdrowiu, podlega:","a":["tylko karze aresztu;","karze aresztu lub grzywny;","tylko karze pozbawienia wolności do lat 2;"],"c":1},{"q":"Kto bez wymaganego zezwolenia wyrabia bron palna albo amunicje lub nia handluje, podlega karze:","a":["pozbawienia wolności od roku do lat 10;","pozbawienia wolności od 6 miesięcy do lat 8;","pozbawienia wolności do lat 10 oraz utraty praw publicznych na zawsze;"],"c":0},{"q":"Właściwy organ Policji może cofnąć pozwolenie na broń, w przypadku :","a":["zbycia przez osobę posiadającą pozwolenie na broń posiadanej broni;","wyjazdu osoby posiadającej pozwolenie na broń za granicę na czas dłuższy niż 3 miesiące;","naruszenia przez osobę posiadającą pozwolenie na broń obowiązku rejestracji broni;"],"c":2},{"q":"Posiadacz broni, w przypadku jej utraty, zobowiązany jest niezwłocznie powiadomić o tym fakcie Policję, nie później jednak niż w ciągu:","a":["24 godziny od chwili stwierdzenia utraty broni;","12 godzin od chwili stwierdzenia utraty broni;","48 godzin od chwili stwierdzenia utraty broni;"],"c":0},{"q":"Po zakończeniu strzelania, przed opuszczeniem stanowiska strzeleckiego broń musi być:","a":["wyczyszczona i schowana do pokrowca lub kabury;","rozładowana, zabezpieczona;","schowana do kabury lub pokrowca;"],"c":1},{"q":"Bronia uzywana do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) moze byc m.in.:","a":["gładkolufowa broń śrutowa, to jest strzelba o kalibrze wagomiarowym nie większym niż 10, z komorą nabojową o długości do 86 mm;","gładkolufowa broń śrutowa, to jest strzelba o kalibrze wagomiarowym nie większym niż 12, z komorą nabojową o długości do 76 mm;","gładkolufowa broń śrutowa, to jest strzelba o kalibrze wagomiarowym nie większym niż 12, z komorą nabojową o długości do 86 mm;"],"c":1},{"q":"Czy Sąd może odstąpić od wymierzenia kary w razie przekroczenia granicy obrony koniecznej:","a":["tak, gdy jej przekroczenie było usprawiedliwione okolicznościami zamachu;","nie;","tak, gdy jej przekroczenie było wynikiem strachu lub wzburzenia usprawiedliwionego okolicznościami zamachu;"],"c":2},{"q":"Zbywajacy bron i amunicje do tej broni obowiazany jest :","a":["powiadomić telefonicznie właściwy organ Policji;","niezwłocznie powiadomić pisemnie o tym fakcie właściwy organ Policji;","zwrócić pozwolenie na broń do właściwego organu Policji;"],"c":1},{"q":"Czy organy Policji mogą ograniczyć lub wykluczyć możliwość noszenia broni:","a":["nie;","tak, ale dotyczy to wyłącznie broni palnej bojowej;","tak;"],"c":2},{"q":"Czy i w jaki sposób korzystajacy ze strzelnicy jest zobowiazany do oswiadczenia o zapoznaniu sie z regulaminem strzelnicy i przepisami bezpieczenstwa?","a":["Tak, własnoręcznym podpisem w ksiażce rejestru pobytu na strzelnicy;","Tak, ustnie w obecności prowadzącego strzelanie;","Nie ma takiego obowiązku;"],"c":0},{"q":"Minimalny opór jezyka spustowego w pistolecie dowlonym dopuszczonym do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) wynosi:","a":["nie jest określony;","1000 g.;","500 g. ;"],"c":0},{"q":"Kaliber broni jest to:","a":["uśredniona średnica przewodu lufy broni palnej;","średnica przewodu lufy broni palnej mierzona w komorze nabojowej;","najmniejsza średnica przewodu lufy broni palnej. W przypadku luf gwintowanych kaliber broni oznacza średnicę lufy mierzoną na polach gwintu;"],"c":2},{"q":"Kto nieumyslnie powoduje utrate broni palnej lub amunicji, która zgodnie z prawem pozostaje w jego dyspozycji, podlega wylacznie:","a":["grzywnie lub karze ograniczenia wolności;","grzywnie, karze ograniczenia wolności albo pozbawienia wolności do roku;","grzywnie, karze ograniczenia wolności albo pozbawienia wolności do 2 lat;"],"c":1},{"q":"Osoba posiadajaca pozwolenie na bron jest obowiazana w razie zmiany miejsca stalego pobytu zawiadomic o tym fakcie pisemnie organ Policji, wlasciwy ze wzgledu na nowe miejsce zamieszkania w terminie:","a":["7 dni od dnia zmiany miejsca zamieszkania;","30 dni od dnia zmiany miejsca zamieszkania;","14 dni od dnia zmiany miejsca zamieszkania;"],"c":2},{"q":"Bronią palną jest wyłącznie:","a":["broń bojowa, myśliwska, sportowa, gazowa, alarmowa i sygnałowa;","broń bojowa, myśliwska, sportowa, pneumatyczna, przedmiot do obezwładniania osób za pomocą ładunków elektrycznych;","broń myśliwska, sportowa, gazowa, pneumatyczna, sygnałowa;"],"c":0},{"q":"Po jakiej komendzie należy bezzwłocznie przerwać strzelanie?","a":["Rozładuj;","Stop;","Ładuj;"],"c":1},{"q":"Odległości strzelań konkurencji karabinowych podczas zawodów rozgrywanych wedlug przepisów Miedzynarodowej Federacji Sportu Strzeleckiego (ISSF) to:","a":["10 m., 50 m., 300 m.;","10 m., 25 m., 50 m.;","25 m., 50 m.; 100 m."],"c":0},{"q":"W konkurencjach pistoletowych rozgrywanych wedlug przepisów Miedzynarodowej Federacji Sportu Strzeleckiego (ISSF) dopuszczalne sa:","a":["optyczne przyrządy celownicze;","plamkowe przyrządy celownicze;","wyłącznie otwarte przyrządy celownicze;"],"c":2},{"q":"Pozwolenie na broń - z wyłączeniem broni sportowej i myśliwskiej - wydaje się osobie, która ukończyła:","a":["21 rok życia;","20 rok życia;","18 rok życia;"],"c":0},{"q":"W przypadku naruszenia zasady uzywania broni - która jest zdolna do razenia celów na odleglosc - przez osobe posiadajaca pozwolenie na nia w celach szkoleniowych i sportowych wylacznie na strzelnicy:","a":["organ Policji cofa obligatoryjnie pozwolenie;","organ Policji cofa obligatoryjnie pozwolenie, ale tylko w przypadku, gdy naruszenie to nastąpiło z winy umyślnej;","organ Policji może cofnąć pozwolenie;"],"c":2},{"q":"Po jakiej komendzie należy rozladować broń, zabezpieczyć ją i umieścić na stanowisku strzeleckim?","a":["Rozładuj;","Stop;","Ładuj;"],"c":0},{"q":"Maksymalna dlugosc lufy pistoletu dowolnego dopuszczonego do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) wynosi:","a":["maksymalna długość lufy nie jest określona;","220 mm;","850 mm;"],"c":0},{"q":"Odległości strzelań, które obowiązują w konkurencjach zatwierdzonych przez Międzynarodową Federację Sportu Strzeleckiego (ISSF) to:","a":["10 m, 25 m, 50 m, 100 m;","10 m, 25 m, 50 m, 300 m;","15 m, 30 m, 50 m, 300 m;"],"c":1},{"q":"Właściwy organ Policji cofa pozwolenie na broń, jeżeli osoba, której takie pozwolenie wydano:","a":["toczy się wobec niej postepowanie w sprawie o nieumyślne przestępstwo przeciwko życiu i zdrowiu;","jest skazana prawomocnym orzeczeniem sądu za nieumyślne przestępstwo przeciwko życiu i zdrowiu;","została ukarana manadtem karnym;"],"c":1},{"q":"Zaświadczenie uprawniające do nabycia broni ważne jest:","a":["trzy miesiące;","bezterminowo;","jeden miesiąc;"],"c":1},{"q":"Jakie czynności należy podjąć po zakończeniu strzelania?","a":["Wyłącznie zabezpieczyć broń i schować do kabury lub pojemnika do transportu broni;","Wyłącznie opuścić stanowisko strzeleckie;","Rozładować broń, przedstawić do kontroli prowadzącemu strzelanie i zabezpieczyć;"],"c":2},{"q":"Jakie czynnosci naleza do obowiazków prowadzacego strzelanie?","a":["Odpowiadzanie za bezpieczeństwo użytkowników strzelnicy i osób im towarzyszących, wyznaczanie korzystającym ze strzelnicy stanowisk strzeleckich oraz prowadzenie książki rejestru pobytu ze strzelnicy;","Prowadzenie statystyki osób przebywających na strzelnicy;","Wyłącznie wydawania broni i amunicji osobom korzystającym ze strzelnicy;"],"c":0},{"q":"Bronią używaną do strzelania konkurencji zatwierdzonych przez Międzynarodową Federację Sportu Strzeleckiego (ISSF) może być m.in. broń pneumatyczna przeznaczona do strzelania pociskami dowolnego rodzaju i kształtu o kalibrze 4,5 mm (.177\") wykonanymi ze stopu ołowiu, w tym:","a":["pistolety na sprężone powietrze lub CO2 o ciężarze nie przekraczającym 1500 g, oporze języka spustowego nie mniejszym niż 400 g, mieszczące się w pudełku o wewnętrznych wymiarach 420 mm x 200 mm x 50 mm;","karabiny na sprężone powietrze lub CO2 o ciężarze nie przekraczającym 5500 g, dowolnym oporze języka spustowego, w których odległość od wylotu lufy do końca celownika nie przekracza 850 mm;","karabiny na sprężone powietrze lub CO2 o ciężarze nie przekraczającym 6500 g, dowolnym oporze języka spustowego, w których odległość od wylotu lufy do końca celownika nie przekracza 950 mm;"],"c":1},{"q":"Karabin dowolny 60 strzalów lezac wg przepisów ISSF jest to konkurencja polegajaca na strzelaniu do tarczy oddalonej od zawodnika o:","a":["100 metrów;","10 metrów;","50 metrów;"],"c":2},{"q":"Za nie przestrzeganie regulaminów i przepisów w czasie trwania zawodów strzeleckich stosowane są następujące kary:","a":["upomnienie, ostrzeżenie, dyskwalifikacja;","ostrzeżenie, odjęcie punktów, dyskwalifikacja;","ostrzeżenie, dyskwalifikacja;"],"c":1},{"q":"Kto uzywa w celach szkoleniowych lub sportowych broni zdolnej do razenia celów na odleglosc poza strzelnicami podlega karze:","a":["ograniczenia wolności do lat 2;","aresztu lub grzywny;","pozbawienia wolności do lat 2;"],"c":1},{"q":"Istotnymi częściami amunicji są:","a":["pociski wypełnione chemicznymi środkami obezwładniającymi, których działanie zagraża życiu lub zdrowiu, kowadełko, łuska;","pociski wypełnione materiałami wybuchowymi, chemicznymi środkami obezwładniającymi lub zapalającymi albo innymi substancjami, których działanie zagraża życiu lub zdrowiu, spłonki inicjujące spalanie materiału miotającego i materiał miotający w postaci prochu strzelniczego;","spłonki inicjujące spalanie materiału miotającego, łuska;"],"c":1},{"q":"Czy na strzelnicy wolno używać broni innych osób korzystających ze strzelnicy:","a":["bezwzględnie nie;","tak, ale tylko za zgodą prowadzącego strzelanie;","tak, ale tylko za zgodą użytkownika broni;"],"c":2},{"q":"Jakie czynnosci nalezy wykonac po komendzie \"LADUJ!\":","a":["wcześniej załadowany magazynek należy włożyć do broni i czekać na komendę \"START\";","należy załadować broń wprowadzając magazynek z nabojami do pistoletu i rozpocząć strzelanie;","należy załadować magazynek nabojami, następnie włożyć go do broni, wprowadzić pierwszy nabój do komory nabojowej i czekać na następne komendy prowadzącego strzelanie;"],"c":2},{"q":"Amunicja uzywana do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) moze byc m.in. :","a":["amunicja centralnego zapłonu kal 7,62-11,45 mm (.30''-.45'') typu magnum;","amunicja bocznego zapłonu o kalibrze 5,6 mm (.22'') \"long rifle\", której pociski są wykonane z ołowiu lub podobnego miękkiego materiału;","każda amunicja o kalibrze 5,6 mm-11,45 mm (.22''-.45'') z pociskami pełnopłaszczowymi zawierającymi rdzeń wykonany z materiału twardszego niż stop ołowiu;"],"c":1},{"q":"Na zawodach strzeleckich z broni krótkiej na 25 m, magazynek ladujemy nabojami:","a":["przed komendą \"ŁADUJ\";","w trakcie czasu przygotowawczego;","po komendzie \"ŁADUJ\";"],"c":2},{"q":"Stan wyzszej koniecznosci jest to wylacznie dzialanie w celu:","a":["uchylenia bezpośredniego niebezpieczeństwa, grożącego jakiemukolwiek dobru chronionemu prawem, a dobro poświęcone przedstawia wartość niższą od dobra ratowanego;","uchylenia bezpośredniego niebezpieczeństwa grożącego dobru chronionemu prawem;","uchylenia bezpośredniego niebezpieczeństwa grożącego jakiemukolwiek dobru chronionemu prawem, bądź ratowania dobra chronionego prawem, poświęcając dobro o wartości niższej od dobra ratowanego, jeżeli niebezpieczeństwa nie można uniknąć inaczej;"],"c":2},{"q":"Właściwy organ Policji w stosunku do osoby posiadającej pozwolenie na broń, która nosi broń, znajdując się w stanie po użyciu alkoholu lub substancji psychotropowej albo środka zastępczego,:","a":["przejmuje do depozytu broń wraz z dokumentami potwierdzającymi legalność posiadania broni, nie podejmując żadnych czynności administracyjnych;","może cofnąć pozwolenie na broń, uzależniając to od zawartości alkoholu we krwi osoby zatrzymanej z bronią;","cofa pozwolenie na broń;"],"c":2},{"q":"Komendę \"STOP\" może wydać:","a":["każda osoba, która uzna, iż istnieje zagrożenie na strzelnicy;","tylko prowadzący strzelanie;","tylko osoba uczestnicząca w strzelaniu;"],"c":0},{"q":"Broń palna oraz inna broń zdolna do rażenia celów na odległość może być używana w celach szkoleniowych i sportowych:","a":["tylko na strzelnicach;","na strzelnicach lub prywatnych posesjach za zgodą sąsiadów;","w dowolnym miejscu o ile nie zgraża to osobom postronnym;"],"c":0},{"q":"Za ważną przyczynę wydania pozwolenia na broń do celów sportowych uważa się w szczególności:","a":["udokumentowane członkostwo w stowarzyszeniu o charakterze strzeleckim, posiadanie kwalifikacji sportowych potwierdzonych \"patentem strzeleckim\" oraz licencji właściwego polskiego związku sportowego;","wyrażenie, w formie pisemnej, chęci uprawiana strzelectwa sportowego;","posiadanie licencji sędziego strzelectwa sportowego;"],"c":0},{"q":"Maksymalna waga pistoletu sportowego dopuszczonego do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) wynosi:","a":["1000 g.;","1500 g.;","1400 g.;"],"c":2},{"q":"Kto nosi bron po spozyciu alkoholu lub substancji psychotropowych albo podobnie dzialajacego podlega:","a":["karze aresztu lub grzywny;","karze pozbawienia wolności do lat 3;","karze ograniczenia wolności do lat 2;"],"c":0},{"q":"Osoba, która utracila uprawnienie do posiadania broni jest obowiazana:","a":["niezwłocznie przekazać broń i amunicję właściwemu organowi Policji celem pozbawienia broni i amunicji cech użytkowych;","niezwłocznie zbyć broń i amunicją do tej broni;","niezwłocznie przekazać broń i amunicję do depozytu właściwego organu Policji;"],"c":1},{"q":"Zgodnie z rozporzadzeniem Ministra Spraw Wewnetrznych i Administracji z dnia 15 marca 2000 roku sprawie wzorcowego regulaminu strzelnic bron palna na strzelnicy poza stanowiskiem strzeleckim musi byc:","a":["rozładowana z otwartymi komorami nabojowymi, bez pasów i pokrowców. W przypadku pistoletów i rewolwerów dozwolone jest ich noszenie w kaburach. Dopuszcza się inny sposób noszenia broni, jeśli tak stanowi regulamin zawodów;","zabezpieczona i schowana w kaburze;","rozładowana, schowana wyłącznie w pokrowcu;"],"c":0},{"q":"Kto nie dopelnia obowiazku zawiadomienia Policji o utracie lub zbyciu innej osobie broni i amunicji do tej broni podlega:","a":["tylko karze grzywny;","karze aresztu lub grzywny;","karze pozbawienia wolności do lat 2;"],"c":1},{"q":"Jesli bron nie zostanie zbyta w terminie 30 dni po utracie uprawnienia do posiadania broni nalezy:","a":["wyrazić zgodę na jej zniszczenie;","złożyć oświadczenie o przeniesieniu własności broni i amunicji na rzecz Skarbu Państwa;","złożyć broń wraz z amunicją do depozytu właściwego organu Policji;"],"c":2},{"q":"Która z nizej wymienionych konkurencji zalicza się do dyscyplin strzelan ze strzelby gladkolufowej:","a":["Ruchoma Tarcza","Karabin 60 strzałów leżąc","Double Trap"],"c":2},{"q":"Czy gotowe lub obrobione istotne czesci broni lub amunicji uwaza sie za bron lub amunicje:","a":["nie, tylko gotowe istotne części broni i amunicji uważa się za broń lub amunicję;","nie, tylko gotową broń lub amunicje uważa się za broń lub amunicję;","tak;"],"c":2},{"q":"Osobie, która nosi broń, naruszając ograniczenie lub wykluczenie możliwości jej noszenia określone przez właściwy organ Policji w pozwoleniu na broń, albo nosi broń, naruszając zakaz jej noszenia wprowadzony przez ministra właściwego do spraw wewnętrznych :","a":["cofa się obligatoryjnie pozwolenie na broń;","właściwy organ Policji może cofnąć pozwolenie na broń, ale nie musi;","cofa się obligatoryjnie pozwolenie na broń, ale tylko w przypadku gdy znajdowała się ona pod wpływem alkoholu;"],"c":0},{"q":"Czy na terenie strzelnicy wolno spożywać alkohol lub używać środki odurzające oraz czy wolno przebywać na strzelnicy osobom będącym pod ich wpływem:","a":["tak, ale za zgodą właściciela obiektu;","bezwzględnie nie;","tak, ale tylko za wiedzą prowadzącego strzelanie;"],"c":1},{"q":"Pistolet sportowy 30+30 strzalów wg przepisów ISSF jest to konkurencja polegajaca na strzelaniu do tarczy oddalonej od zawodnika o:","a":["25 metrów;","50 metrów;","15 metrów;"],"c":0},{"q":"Amunicja bocznego zapłonu jest to:","a":["amunicja, w której masa zapłonowa wprasowana jest bezpośrednio w kryzę łuski;","amunicja, w której masa zapłonowa znajduje się w środku dna łuski;","każda amunicja o kalibrze mniejszym niż 7,62 mm"],"c":0},{"q":"W strzelectwie sportowym konkurencja TRAP to strzelanie do rzutków:","a":["wyrzucanych z dwóch budek (wysokiej i niskiej);","wyrzucanych z linii stanowisk strzeleckich;","wyrzucanych ze schronu znajdującego się w odległości 15 m od linii stanowisk strzeleckich;"],"c":2},{"q":"Czy dozwolone jest dokonywanie przeróbek broni zmieniających jej rodzaj, kaliber lub przeznaczenie:","a":["tak;","tylko z broni gazowej na broń bojową;","nie;"],"c":2},{"q":"Postawy strzeleckie w konkurencjach karabinowych rozgrywanych wedlug przepisów Miedzynarodowej Federacji Sportu Strzeleckiego (ISSF) to:","a":["wyłacznie stojąca;","klęcząca, leżąca, stojąca;","wyłącznie leżąca;"],"c":1},{"q":"Kto nosi bron, naruszajac ograniczenie lub wykluczenie mozliwosci jej noszenia okreslone przez wlasciwy organ Policji w pozwoleniu na bron, albo nosi bron, naruszajac zakaz jej noszenia wprowadzony przez ministra wlasciwego do spraw wewnetrznych podlega karze:","a":["wyłącznie aresztu;","karze ograniczenia wolności do lat 2;","aresztu lub grzywny;"],"c":2},{"q":"Pozwolenia na bron nie wydaje sie osobom:","a":["wykazującym istotne zaburzenia funkcjonowania psychologicznego;","nie uzaleznionym od alkoholu;","nie skazanym prawomocnym orzeczeniem sądu;"],"c":0},{"q":"Oplata za egzamin potwierdzajacy posiadanie odpowiednich kwalifikacji do uprawiania sportów o charakterze strzeleckim pobierana jest na podstawie przepisów:","a":["Regulaminów Polskiego Związku Strzelectwa Sportowego;","rozporządzenia ministra odpowiedzialnego za sprawy kultury fizycznej;","Ustawy z dnia 21 maja 1999 roku o broni i amunicji;"],"c":2},{"q":"Do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) zabronione jest uzywanie m.in.:","a":["amunicji centralnego zapłonu o kalibrze mniejszym niż 8 mm (.315'');","nabojów smugowych, przeciwpancernych i zapalających;","amunicji z pociskami wykonanymi z ołowiu lub podobnego, miękkiego materiału;"],"c":1},{"q":"Wlasciwy organ Policji cofa pozwolenie na bron, jezeli osoba, której takie pozwolenie wydano:","a":["jest osobą uzależnioną od nikotyny;","jest uzależniona od alkoholu lub od substancji psychoaktywnych;","jest osobą niepełnosprawną;"],"c":1},{"q":"Istotnymi częściami broni palnej są:","a":["szkielet broni, baskila, lufa, komora zamkowa, magazynek;","szkielet broni, baskila, lufa z komorą nabojową, komora zamkowa, zamek oraz bęben nabojowy;","szkielet broni, lufa, komora zamkowa, zamek, bezpiecznik;"],"c":1},{"q":"Czy Sad moze odstapic od wymierzenia kary badz zastosowac nadzwyczajne zlagodzenie kary w razie przekroczenia granicy obrony koniecznej:","a":["tak, gdy sprawca działał w celu odparcia bezpośredniego, bezprawnego zamachu na jakiekolwiek dobro chronione prawem i zastosował sposób obrony niewspółmierny do niebezpieczeństwa zamachu;","tak, gdy sprawca działał wyłącznie pod wpływem strachu usprawiedliwionego okolicznościami zamachu;","tak, gdy sprawca działał w celu uchylenia bezpośredniego niebezpieczeństwa grożącego dobru chronionemu prawem, a zastosował sposób niewspółmierny do niebezpieczeństwa zamachu;"],"c":0},{"q":"Która z poniższych czynności jest na strzelnicy bezwzgelędnie zabroniona?","a":["Używanie środków odurzających;","Głośne rozmowy;","Używanie telefonów komórkowych i innych urządzeń nadawczo-odbiorczych;"],"c":0},{"q":"Jakie są ograniczenia w ubiorze zawodników strzelających konkurencje pistoletowe według regulaminów zatwierdzonych przez Międzynarodową Federację Sportu Strzeleckiego (ISSF)?:","a":["ubiór powinien mieć ograniczenia zgodne z przepisami międzynarodowymi dotyczącymi strzelań karabinowych;","nie ma ograniczeń w ubiorze zawodników strzelających z broni krótkiej;","elementy ubioru nie mogą podpierać lub unieruchamiać ciała, ramion, nadgarstka, nóg lub kostek. Buty nie mogą zakrywać kostki;"],"c":2},{"q":"Organ Policji obligatoryjnie cofa pozwolenie jeżeli osoba, której pozwolenie wydano:","a":["nie przestrzega obowiązku rejestracji broni w ciągu 5 dni od dnia zakupu;","nie przestrzega warunków określonych w pozwoleniu na broń;","nie przestrzega obowiązku zawiadamiania właściwego organu Policji o zmianie miejsca zamieszkania w terminie 14 dni od dnia jego zmiany;"],"c":1},{"q":"W rozumieniu ustawy o broni i amunicji noszenie broni oznacza:","a":["każdy sposób przemieszczania broni;","każdy sposób przemieszczania broni środkami transportu publicznego;","każdy sposób przemieszczania załadowanej broni przez osobę posiadającą broń;"],"c":2},{"q":"Jakie czynności należy wykonać po komendzie \"STOP!\":","a":["bezzwłocznie przerwać strzelanie;","natychmiast rozładować broń;","wyjąc magazynek i czekać na dalsze polecenia;"],"c":0},{"q":"Wyjmowanie broni na strzelnicy odbywa się wyłącznie na:","a":["stanowisku strzeleckim lub treningowym tylko na polecenie prowadzącego strzelanie lub trening strzelecki;","stanowisku strzeleckim lub treningowym;","stanowisku strzeleckim lub treningowym za zgodą właściciela strzelnicy;"],"c":0},{"q":"Broń palną można posiadać wyłącznie:","a":["na podstawie pozwolenia na broń wydanego przez komendanta wojewódzkiego Policji, bez względu na miejsce stałego pobytu zainteresowanej osoby lub siedzibę zainteresowanego podmiotu, a w przypadku żołnierzy zawodowych - na podstawie pozwolenia wydanego przez właściwy organ wojskowy;","na podstawie pozwolenia na broń wydanego przez właściwego ze względu na miejsce stałego pobytu zainteresowanej osoby lub siedzibę zainteresowanego podmiotu, komendanta wojewódzkiego Policji, a w przypadku żołnierzy zawodowych - na podstawie pozwolenia wydanego przez właściwego komendanta oddziału Żandarmerii Wojskowej;","na podstawie pozwolenia na broń wydanego przez właściwego, ze względu na miejsce stałego pobytu zainteresowanej osoby lub siedzibę zainteresowanego podmiotu, komendanta powiatowego Policji, a w przypadku żołnierzy zawodowych - na podstawie pozwolenia wydanego przez właściwy organ wojskowy;"],"c":1},{"q":"Czy osoba występująca z wnioskiem o wydanie pozwolenia na broń, obowiązana jest dołączyć do niego orzeczenie lekarskie i psychologiczne:","a":["tak;","nie;","tylko na żądanie organu Policji;"],"c":0},{"q":"Zaświadczenia uprawniające do nabycia broni traci swoją ważność:","a":["po upływie jednego miesiąca od daty jego wystawienia","nie traci ważności","po upływie trzech miesięcy od daty jego wystawienia"],"c":1},{"q":"Pozwolenie na broń wydane do celów sportowych uprawnia do posiadania broni palnej:","a":["bocznego zapłonu z lufami gwintowanymi, o kalibrze do 6 mm;","pistoletów sygnałowych;","pistoletów maszynowych o kalibrze od 6 mm do 12 mm;"],"c":0},{"q":"Odkładanie załadowanej broni w czasie przerw w strzelaniu jest:","a":["bezwzględnie zabronione;","dopuszczalne w czasie patrzenia przez lunetę;","dopuszczalne, ale wyłącznie w konkurencjach pistoletowych;"],"c":0},{"q":"Maksymalna dlugosc lufy pistoletu sportowego dopuszczonego do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) wynosi:","a":["140 mm;","175 mm;","153 mm;"],"c":2},{"q":"Osoby fizyczne posiadajace bron palna i amunicje do niej, sa obowiazane przechowywac ja:","a":["w sposób uniemożliwiający dostęp do niej osobom nieuprawnionym;","w kasetach, sejfach, szafach posiadających zamki atestowane;","w urządzeniach spełniających wymagania conajmniej klasy S1 według normy PN-EN 14450;"],"c":2},{"q":"Pozwolenia na broń nie wymaga się w przypadku:","a":["posiadania broni palnej sportowej;","posiadania broni pneumatycznej;","żadna z pozostałych dwóch odpowiedzi nie jest prawidłowa;"],"c":1},{"q":"Wlasciwy organ Policji cofa pozwolenie na bron, jezeli osoba, której takie pozwolenie wydano:","a":["wykazuje istotne zaburzenia funkcjonowania psychologicznego;","w opinii osób trzecich jej zachowanie może wykazywać pewnego rodzaju zaburzenia funkcjonowania psychologicznego;","w opinii obsługi strzelnicy jest osobą z zaburzeniami funkcjonowania psychologicznego;"],"c":0},{"q":"Amunicję można nabywać:","a":["na podstawie zaświadczenia uprawniającego do zakupu amunicji wydanego przez właściwy organ Policji lub Żandarmerii Wojskowej;","na podstawie dowodu zakupu broni;","na podstawie legitymacji posiadacza broni lub świadectwa broni, wyłącznie dla tej broni, która jest określona w legitymacji;"],"c":2},{"q":"Bronia uzywana do strzelania konkurencji zatwierdzonych przez Miedzynarodowa Federacje Sportu Strzeleckiego (ISSF) moze byc m.in. malokalibrowa bron palna bocznego zaplonu, w tym:","a":["pistolet sportowy i pistolet standardowy, to jest pistolet i rewolwer o kalibrze 5,6 mm (.22\") przeznaczony do strzelania amunicją \"long rifle\", o ciężarze wraz z rozładowanym magazynkiem nie przekraczającym 1600 g, długości lufy nie przekraczającej 158 mm oraz odległości między muszką a szczerbinką nie większej niż 220 mm, oporze języka spustowego nie mniejszym niż 1000 g, mieszczące się w pudełku o wewnętrznych wymiarach 300 mm x 150 mm x 50 mm;","pistolet dowolny to jest pistolet jednostrzałowy o kalibrze 5,6 mm (.22\"), o dowolnych wymiarach i ciężarze oraz o dowolnym oporze języka spustowego;","pistolet szybkostrzelny, to jest pistolet o kalibrze 5,6 mm (.22\") przeznaczony do strzelania amunicją \"short\", o ciężarze wraz z rozładowanym magazynkiem nie przekraczającym 1360 g, dowolnym oporze języka spustowego, mieszczący się w pudełku w wewnętrznych wymiarach 800 mm x 450 mm x 150 mm;"],"c":1},{"q":"Właściwy organ Policji może cofnąć pozwolenie na broń:","a":["w przypadku nabycia broni lub amunicji przy użyciu środków porozumiewania na odległość;","w przypadku przewożenia broni środkami transportu publicznego;","w przypadku naruszenia przez osobę posiadającą pozwolenie na broń obowiązku rejestracji broni;"],"c":2},{"q":"Zarejestrowanie broni wymagajacej pozwolenia potwierdza sie:","a":["oddzielną decyzją administracyjną wydaną przez właściwy organ Policji lub Żandarmerii Wojskowej;","w legitymacji posiadacza broni lub w świadectwie broni;","wyłącznie w dokumentach posiadacza broni przechowywanych przez właściwy organ Policji lub Żandarmerii Wojskowej;"],"c":1},{"q":"Na wniosek szkoły, organizacji sportowej, Polskiego Związku Łowieckiego, stowarzyszenia obronnego pozwolenie na broń do celów sportowych lub łowieckich może być wydane osobie mającej ukończone:","a":["18 lat","16 lat","20 lat"],"c":0},{"q":"Pozwolenia na bron nie wydaje sie osobom:","a":["które ukończyły 21 rok życia;","nie stanowiącym zagrożenia dla siebie, porządku lub bezpieczeństwa publicznego;","skaznym za umyślne przestępstwo lub umyślne przestępstwo skarbowe;"],"c":2},{"q":"Rejestracji broni dokonuje właściwy organ Policji lub Żandarmerii Wojskowej na podstawie:","a":["zaświadczenia uprawniającego do nabycia broni;","dowodu nabycia broni;","fotografii broni;"],"c":1},{"q":"Właściwy organ Policji cofa pozwolenie na broń, jeżeli osoba, której takie pozwolenie wydano:","a":["nie należy do osób z zaburzeniami psychicznymi;","należy do osób z zaburzeniami psychicznymi;","jest osobą z wadą wzroku;"],"c":1},{"q":"Czy wolno posiadać amunicję wykonaną niefabrycznie, w tym także taką, do której wytworzenia wykorzystano fabrycznie nowe elementy amunicji:","a":["nie;","tak, pod warunkiem, że amunicja ta została wytworzona na własny użytek przez osobę posiadającą pozwolenie na broń myśliwską, sportową lub kolekcjonerską;","tak, pod warunkiem, że amunicja została wytworzona na własny użytek przez osobę posiadającą wyłącznie pozwolenie na broń myśliwską;"],"c":1},{"q":"Czy osoba posiadajaca pozwolenie na bron do celów sportowych jest obowiazana przedstawic wlasciwemu organowi Policji aktualne orzeczenie lekarskie i psychologiczne:","a":["nie ma takiego obowiązku;","tak, raz na 3 lata;","tak, raz na 5 lat;"],"c":0},{"q":"Odleglosci strzelan konkurencji pistoletowych podczas zawodów rozgrywanych wedlug przepisów Miedzynarodowej Federacji Sportu Strzeleckiego (ISSF) to:","a":["15 m.; 25 m.;","10 m., 25 m., 50 m.;","10 m.; 25 m.; 300 m.;"],"c":1},{"q":"Karabin dowolny 60 strzalów lezac jest to konkurencja polegajaca na strzelaniu do tarczy oddalonej od zawodnika o:","a":["100 metrów;","10 metrów;","50 metrów;"],"c":2},{"q":"Broń pneumatyczną można posiadać wyłącznie:","a":["na podstawie pozwolenia na broń wydanego przez właściwego ze względu na miejsce stałego pobytu zainteresowanej osoby lub zainteresowanego podmiotu komendanta powiatowego Policji, a w przypadku żołnierzy zawodowych - właściwego komendanta oddziału Żandarmerii Wojskowej","na podstawie karty rejestracyjnej broni pneumatycznej wydanej przez właściwego ze względu na miejsce stałego pobytu zainteresowanej osoby lub siedzibę zainteresowanego podmiotu komendanta powiatowego Policji, a w przypadku żołnierzy zawodowych - właściwego komendanta oddziału Żandarmerii Wojskowej;","na podstawie pozwolenia na broń wydanego przez komendanta wojewódzkiego Policji, bez względu na miejsce stałego pobytu zainteresowanej osoby lub siedzibę zainteresowanego podmiotu, a w przypadku żołnierzy zawodowych - na podstawie pozwolenia wydanego przez właściwy organ wojskowy;"],"c":1},{"q":"Pistolet sportowy 30+30 strzałów jest to konkurencja polegajaca na strzelaniu do tarczy oddalonej od zawodnika o:","a":["50 metrów;","15 metrów;","25 metrów;"],"c":2},{"q":"Czy osoba deponująca broń w jednostce Policji ma prawo do dostępu do niej w celu okazania jej osobom zainteresowanym jej nabyciem oraz oceny stanu broni:","a":["tak, ale dopiero po uzgodnieniu z jednostką deponującą;","tak, pod warunkiem, że otrzyma zgodę komendanta wojewódzkiego Policji","nie"],"c":0},{"q":"Właściwy organ Policji cofa pozwolenie na broń, jeżeli osoba, której takie pozwolenie wydano:","a":["czasowo przebywa poza miejscem stałego pobytu;","nie jest obywatelem Rzeczypospolitej Polskiej;","nie posiada miejsca stałego pobytu na terytorium Rzeczypospolitej Polskiej;"],"c":2},{"q":"Pozwolenie na bron wydane do celów sportowych uprawnia do posiadania broni palnej:","a":["centralnego zapłonu z lufami gwintowanymi o kalibrze do 12 mm;","broni gazowej o kalibrach od 6 mm do 12 mm","broni palnej, konstrukcyjnie przeznaczonej do strzelania wyłącznie amunicją ślepą, w tym samoczynnej;"],"c":0},{"q":"Pistolet szybkostrzelny jest to konkurencja polegająca na strzelaniu do 5 tarcz oddalonych od zawodnika o:","a":["10 metrów;","50 metrów;","25 metrów;"],"c":2},{"q":"Zgodnie z rozporzadzeniem Ministra Spraw Wewnetrznych i Administracji z dnia 15 marca 2000 roku sprawie wzorcowego regulaminu strzelnic bron palna na strzelnicy poza stanowiskiem strzeleckim musi byc:","a":["rozładowana, zabezpieczona i schowana w kaburze, pokrowcu lub kasecie przeznaczonej do przenoszenia broni;","zabezpieczona i schowana w kaburze;","rozładowana, schowana wyłącznie w pokrowcu;"],"c":0},{"q":"Właściwy organ Policji może cofnąć pozwolenie na broń:","a":["jeżeli posiadacz pozwolenia na broń do celów sportowych nie dopełnia obowiązku przedstawienia właściwemu organowi Policji raz na pięć lat aktualnego orzeczenia lekarskiego i psychologicznego;","jeżeli posiadacz pozwolenia na broń uzyskał pozwolenie na broń do innych celów niż już posiadane;","jeżeli ustały okoliczności faktyczne, które stanowiły podstawę do jego wydania;"],"c":2},{"q":"Właściwy organ Policji może cofnąć pozwolenie na broń w przypadku naruszenia przez osobę posiadającą pozwolenie:","a":["konieczności posiadania miejsca zameldowania na terytorium Rzeczypospolitej Polskiej;","obowiązku rejestracji broni;","obowiązku powiadomienia Policji o utracie broni."],"c":1},{"q":"Amunicję można nabywać na podstawie:","a":["legitymacji posiadacza broni lub świadectwa broni, wyłącznie do broni, która jest określona w legitymacji lub świadectwie broni. Na ich podstawie można również nabywać amunicję do broni o innym kalibrze;","legitymacji posiadacza broni lub świadectwa broni, wyłącznie dla tej broni, która jest określona w legitymacji albo na podstawie świadectwa broni i pisemnego zamówienia podmiotu uprawnionego do nabycia amunicji;","odrębnego pozwolenia wydanego przez właściwy organ Policji;"],"c":1}],"sets":{"1051":[[0,"012"],[1,"012"],[2,"012"],[3,"012"],[4,"012"],[5,"012"],[6,"012"],[7,"012"],[8,"012"],[9,"012"]],"1050":[[10,"012"],[11,"012"],[12,"012"],[13,"012"],[14,"012"],[15,"012"],[16,"012"],[17,"012"],[18,"012"],[19,"012"]],"1049":[[20,"012"],[21,"012"],[22,"012"],[23,"012"],[24,"012"],[25,"012"],[26,"012"],[27,"012"],[28,"012"],[29,"012"]],"1048":[[30,"012"],[31,"012"],[32,"012"],[33,"012"],[34,"012"],[35,"012"],[36,"012"],[37,"012"],[38,"012"],[39,"012"]],"1047":[[40,"012"],[41,"012"],[42,"012"],[43,"012"],[44,"012"],[45,"012"],[46,"012"],[47,"012"],[48,"012"],[49,"012"]],"1060":[[50,"012"],[51,"012"],[52,"012"],[2,"021"],[53,"012"],[14,"102"],[47,"120"],[27,"102"],[54,"012"],[18,"012"]],"1059":[[55,"012"],[56,"012"],[57,"012"],[23,"102"],[58,"012"],[59,"012"],[36,"102"],[16,"120"],[60,"012"],[8,"012"]],"1058":[[61,"012"],[62,"012"],[63,"012"],[22,"021"],[24,"021"],[25,"012"],[64,"012"],[65,"012"],[38,"201"],[28,"012"]],"1057":[[66,"012"],[67,"012"],[68,"012"],[42,"120"],[69,"012"],[35,"102"],[70,"012"],[37,"201"],[39,"012"],[29,"021"]],"1056":[[71,"012"],[72,"012"],[73,"012"],[74,"012"],[75,"012"],[45,"012"],[76,"012"],[77,"012"],[78,"012"],[49,"120"]],"1087":[[79,"012"],[40,"201"],[80,"012"],[81,"012"],[82,"012"],[15,"201"],[83,"012"],[26,"012"],[84,"012"],[9,"120"]],"1086":[[51,"012"],[85,"012"],[86,"012"],[22,"021"],[14,"102"],[53,"021"],[76,"021"],[37,"012"],[49,"012"],[29,"021"]],"1083":[[87,"012"],[88,"012"],[23,"120"],[68,"102"],[35,"102"],[89,"012"],[77,"102"],[36,"102"],[90,"012"],[60,"012"]],"1082":[[91,"012"],[66,"012"],[12,"102"],[92,"012"],[5,"021"],[44,"102"],[6,"021"],[16,"012"],[93,"012"],[39,"201"]],"1073":[[67,"021"],[94,"012"],[74,"012"],[80,"012"],[4,"012"],[82,"012"],[95,"012"],[70,"102"],[90,"012"],[28,"102"]],"812":[[96,"012"],[97,"012"],[98,"012"],[81,"201"],[82,"021"],[24,"102"],[17,"120"],[99,"012"],[90,"102"],[49,"102"]],"798":[[96,"201"],[20,"012"],[12,"120"],[92,"120"],[34,"102"],[100,"012"],[101,"012"],[7,"201"],[9,"102"],[39,"201"]],"797":[[97,"102"],[102,"012"],[23,"120"],[43,"201"],[45,"012"],[44,"021"],[70,"102"],[103,"012"],[54,"201"],[104,"012"]],"796":[[91,"021"],[31,"201"],[3,"012"],[81,"021"],[82,"102"],[89,"201"],[65,"021"],[36,"120"],[28,"120"],[48,"102"]],"795":[[105,"012"],[106,"012"],[42,"102"],[81,"012"],[107,"012"],[4,"102"],[16,"120"],[36,"012"],[90,"102"],[49,"102"]],"1007":[[108,"012"],[109,"012"],[86,"012"],[68,"120"],[24,"102"],[107,"012"],[64,"120"],[99,"102"],[104,"201"],[110,"012"]],"1006":[[0,"021"],[106,"012"],[111,"012"],[23,"120"],[14,"021"],[4,"102"],[112,"012"],[26,"012"],[84,"201"],[19,"021"]],"939":[[62,"012"],[61,"201"],[32,"102"],[80,"021"],[58,"012"],[100,"102"],[99,"120"],[101,"201"],[110,"120"],[49,"120"]],"938":[[113,"012"],[114,"012"],[68,"120"],[115,"012"],[107,"021"],[24,"021"],[83,"021"],[36,"120"],[84,"201"],[9,"102"]],"937":[[21,"012"],[1,"021"],[116,"012"],[73,"012"],[4,"102"],[59,"021"],[26,"102"],[7,"021"],[90,"102"],[78,"102"]],"944":[[117,"012"],[30,"012"],[13,"012"],[2,"102"],[89,"021"],[35,"102"],[17,"120"],[6,"201"],[39,"021"],[18,"012"]],"943":[[118,"012"],[102,"021"],[86,"012"],[22,"012"],[14,"102"],[4,"120"],[16,"012"],[76,"021"],[54,"201"],[90,"120"]],"942":[[119,"012"],[120,"012"],[3,"120"],[111,"102"],[69,"012"],[25,"102"],[70,"021"],[112,"201"],[28,"120"],[29,"201"]],"941":[[96,"021"],[66,"120"],[23,"012"],[121,"012"],[122,"012"],[45,"201"],[37,"021"],[27,"021"],[48,"102"],[8,"102"]],"940":[[123,"012"],[124,"012"],[12,"102"],[42,"120"],[44,"012"],[82,"021"],[46,"201"],[77,"012"],[38,"021"],[60,"102"]],"1221":[[1,"012"],[125,"012"],[74,"102"],[80,"021"],[44,"021"],[59,"021"],[83,"201"],[101,"021"],[9,"120"],[49,"102"]],"1220":[[106,"201"],[126,"012"],[3,"012"],[57,"012"],[127,"012"],[14,"021"],[6,"021"],[16,"012"],[29,"021"],[18,"102"]],"1219":[[128,"012"],[129,"012"],[12,"120"],[63,"102"],[82,"102"],[24,"102"],[37,"012"],[64,"120"],[48,"012"],[60,"021"]],"1218":[[87,"102"],[55,"102"],[2,"012"],[92,"120"],[15,"012"],[5,"012"],[36,"102"],[47,"012"],[93,"102"],[8,"102"]],"1217":[[108,"021"],[91,"012"],[23,"012"],[43,"021"],[122,"021"],[107,"021"],[70,"102"],[103,"012"],[39,"012"],[19,"102"]],"1114":[[130,"012"],[126,"012"],[111,"102"],[92,"012"],[122,"012"],[45,"201"],[76,"012"],[83,"021"],[54,"201"],[90,"102"]],"1115":[[118,"102"],[21,"012"],[121,"120"],[23,"012"],[15,"021"],[25,"120"],[7,"021"],[26,"102"],[104,"012"],[60,"102"]],"1120":[[131,"012"],[96,"012"],[81,"201"],[33,"102"],[14,"021"],[24,"021"],[27,"012"],[36,"012"],[19,"021"],[84,"201"]],"1121":[[132,"012"],[133,"012"],[86,"102"],[2,"021"],[82,"102"],[44,"012"],[6,"201"],[16,"120"],[104,"021"],[49,"120"]],"1122":[[88,"012"],[108,"021"],[12,"012"],[32,"012"],[75,"021"],[25,"012"],[77,"021"],[65,"021"],[29,"201"],[54,"021"]],"657":[[134,"012"],[135,"012"],[116,"120"],[32,"012"],[25,"012"],[58,"102"],[95,"012"],[136,"012"],[39,"201"],[78,"012"]],"658":[[124,"021"],[21,"102"],[12,"102"],[3,"012"],[14,"012"],[44,"021"],[137,"012"],[77,"012"],[29,"021"],[60,"012"]],"697":[[117,"012"],[30,"012"],[32,"012"],[42,"120"],[122,"021"],[45,"021"],[137,"201"],[101,"021"],[78,"102"],[54,"201"]],"703":[[55,"021"],[50,"201"],[92,"102"],[43,"012"],[89,"021"],[107,"021"],[65,"201"],[16,"102"],[84,"012"],[29,"012"]],"706":[[11,"102"],[66,"102"],[32,"021"],[121,"102"],[82,"102"],[15,"021"],[64,"120"],[101,"021"],[110,"012"],[19,"012"]],"707":[[131,"012"],[126,"012"],[23,"012"],[12,"012"],[122,"012"],[59,"012"],[103,"102"],[36,"012"],[18,"021"],[78,"021"]],"954":[[10,"012"],[41,"102"],[12,"102"],[3,"012"],[14,"021"],[69,"012"],[6,"012"],[136,"102"],[93,"102"],[49,"102"]],"953":[[67,"021"],[138,"012"],[22,"201"],[23,"120"],[122,"201"],[82,"021"],[27,"102"],[137,"201"],[18,"012"],[29,"012"]],"952":[[11,"021"],[20,"102"],[116,"120"],[111,"012"],[4,"102"],[59,"201"],[112,"021"],[139,"012"],[90,"012"],[39,"021"]],"946":[[140,"012"],[141,"012"],[74,"120"],[92,"120"],[15,"201"],[45,"201"],[64,"102"],[83,"021"],[9,"012"],[84,"012"]],"945":[[125,"120"],[94,"021"],[57,"012"],[63,"012"],[34,"120"],[59,"012"],[7,"201"],[95,"012"],[93,"021"],[49,"012"]],"981":[[135,"120"],[102,"012"],[121,"102"],[13,"012"],[69,"012"],[59,"201"],[70,"012"],[27,"102"],[110,"120"],[29,"021"]],"980":[[1,"021"],[142,"012"],[80,"012"],[111,"102"],[82,"021"],[15,"021"],[143,"012"],[7,"021"],[90,"012"],[84,"012"]],"979":[[1,"201"],[113,"012"],[80,"012"],[144,"012"],[44,"012"],[35,"012"],[16,"012"],[26,"021"],[18,"012"],[48,"102"]],"978":[[145,"012"],[91,"102"],[116,"012"],[98,"012"],[24,"102"],[45,"021"],[17,"120"],[77,"102"],[78,"012"],[60,"021"]],"955":[[135,"012"],[134,"021"],[42,"012"],[13,"021"],[89,"021"],[5,"012"],[65,"012"],[17,"102"],[84,"012"],[104,"201"]],"810":[[123,"012"],[85,"021"],[92,"102"],[3,"012"],[58,"102"],[5,"021"],[65,"021"],[76,"021"],[18,"102"],[78,"102"]],"809":[[113,"102"],[66,"120"],[52,"102"],[116,"120"],[100,"120"],[34,"012"],[7,"021"],[103,"021"],[38,"201"],[84,"021"]],"808":[[61,"021"],[146,"012"],[121,"120"],[52,"012"],[69,"120"],[100,"012"],[36,"102"],[77,"021"],[9,"102"],[110,"012"]],"807":[[72,"021"],[0,"201"],[32,"012"],[86,"012"],[89,"021"],[45,"021"],[70,"021"],[95,"201"],[104,"201"],[60,"012"]],"806":[[135,"012"],[141,"012"],[12,"012"],[80,"012"],[14,"102"],[44,"021"],[26,"102"],[101,"021"],[48,"021"],[39,"201"]],"861":[[72,"102"],[56,"021"],[111,"012"],[86,"102"],[100,"102"],[53,"021"],[65,"021"],[37,"021"],[18,"012"],[19,"021"]],"860":[[40,"012"],[51,"012"],[68,"120"],[22,"012"],[15,"201"],[82,"021"],[26,"012"],[27,"021"],[48,"102"],[39,"201"]],"859":[[71,"012"],[117,"021"],[73,"201"],[121,"102"],[24,"012"],[25,"120"],[46,"021"],[77,"102"],[28,"102"],[90,"120"]],"858":[[108,"021"],[102,"021"],[63,"021"],[98,"102"],[122,"201"],[14,"012"],[64,"120"],[17,"102"],[38,"021"],[8,"012"]],"857":[[138,"102"],[132,"021"],[42,"102"],[81,"012"],[89,"021"],[59,"201"],[16,"012"],[36,"120"],[29,"201"],[54,"012"]],"841":[[97,"120"],[135,"120"],[111,"012"],[52,"021"],[69,"102"],[100,"120"],[27,"102"],[65,"201"],[39,"012"],[90,"102"]],"842":[[1,"201"],[85,"021"],[22,"021"],[81,"201"],[14,"021"],[34,"120"],[99,"120"],[77,"102"],[49,"102"],[93,"012"]],"843":[[147,"012"],[114,"201"],[57,"120"],[2,"021"],[45,"021"],[58,"012"],[136,"012"],[7,"021"],[54,"201"],[9,"120"]],"844":[[61,"012"],[50,"012"],[74,"012"],[23,"102"],[25,"012"],[53,"012"],[83,"201"],[16,"120"],[60,"021"],[104,"201"]],"845":[[62,"012"],[128,"021"],[115,"120"],[42,"012"],[122,"012"],[35,"102"],[47,"120"],[112,"201"],[48,"012"],[110,"120"]]}};
+const Q = DATA.questions;
+const SETS = DATA.sets;
+const SET_IDS = Object.keys(SETS).sort((a, b) => a - b);
+const LETTERS = ["A", "B", "C"];
+const app = document.getElementById("app");
+const bar = document.getElementById("bar");
+const barIn = document.getElementById("barIn");
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("pb_" + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("pb_" + k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem("pb_" + k); } catch (e) {} }
+};
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function esc(s) { return s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+const ICONS = {
+  shuffle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>',
+  list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+  exam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>'
+};
+
+/* ---------- widok pytania ---------- */
+// item: {id, order:[indeksy odpowiedzi kanonicznych w kolejności wyświetlania]}
+function questionHTML(item, meta) {
+  const q = Q[item.id];
+  return `<div class="card">
+    <div class="qmeta">${meta}</div>
+    <p class="qtext">${esc(q.q)}</p>
+    <div class="answers">${item.order.map((ai, i) =>
+      `<button class="ans" data-i="${i}"><span class="letter">${LETTERS[i]}</span><span class="txt">${esc(q.a[ai])}</span></button>`).join("")}
+    </div>
+    <div class="verdict" id="verdict"></div>
+  </div>`;
+}
+function correctPos(item) { return item.order.indexOf(Q[item.id].c); }
+
+// pokazuje poprawną (zielono) i błędnie wybraną (czerwono)
+function paintResult(container, item, chosen) {
+  const cp = correctPos(item);
+  container.querySelectorAll(".ans").forEach((b, i) => {
+    b.disabled = true;
+    b.classList.remove("sel");
+    if (i === cp) b.classList.add("ok");
+    else if (i === chosen) b.classList.add("bad");
+    else b.classList.add("dim");
+  });
+}
+
+function setBar(html) { barIn.innerHTML = html; bar.classList.toggle("hidden", !html); }
+function header(title, counter) {
+  return `<header class="top">
+    <button class="icon-btn" id="home" aria-label="Menu">← Menu</button>
+    <h1>${title}</h1><span class="counter" id="counter">${counter || ""}</span>
+  </header>`;
+}
+function bindHome(confirmMsg) {
+  document.getElementById("home").onclick = () => {
+    if (confirmMsg && !confirm(confirmMsg)) return;
+    showMenu();
+  };
+}
+
+let keyHandler = null;
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (keyHandler) keyHandler(e);
+});
+function keyToIndex(e) {
+  const k = e.key.toLowerCase();
+  const m = { "1": 0, "2": 1, "3": 2, a: 0, b: 1, c: 2 };
+  return k in m ? m[k] : -1;
+}
+
+/* ---------- menu ---------- */
+function showMenu() {
+  keyHandler = null;
+  setBar("");
+  const all = store.get("all", null);
+  const resume = all && all.pos > 0 && all.pos < Q.length
+    ? `<span class="resume">Kontynuuj od pytania ${all.pos + 1} z ${Q.length}</span>` : "";
+  const rs = store.get("randStats", { ok: 0, n: 0 });
+  const randInfo = rs.n ? `<span class="resume">Dotychczas: ${rs.ok}/${rs.n} poprawnych (${Math.round(100 * rs.ok / rs.n)}%)</span>` : "";
+  app.innerHTML = `
+    <div class="hero">
+      <h1>Patent strzelecki</h1>
+      <p>${Q.length} unikalnych pytań z ${SET_IDS.length} zestawów egzaminacyjnych.</p>
+    </div>
+    <div class="modes">
+      <button class="mode" id="mRand"><span class="ico">${ICONS.shuffle}</span>
+        <span><b>Nauka – losowe pytania</b><span>Odpowiadasz i od razu widzisz, czy dobrze. Pytania bez końca, w losowej kolejności.</span>${randInfo}</span></button>
+      <button class="mode" id="mAll"><span class="ico">${ICONS.list}</span>
+        <span><b>Wszystkie pytania po kolei</b><span>Każde z ${Q.length} unikalnych pytań jedno po drugim. Postęp jest zapamiętywany.</span>${resume}</span></button>
+      <button class="mode" id="mExam"><span class="ico">${ICONS.exam}</span>
+        <span><b>Egzamin próbny</b><span>10 pytań z prawdziwego zestawu. Wynik i poprawne odpowiedzi pokazują się na końcu.</span></span></button>
+    </div>
+    <p class="foot kbd-hint">Skróty: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> lub <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> – odpowiedź, <kbd>Enter</kbd> – dalej</p>`;
+  document.getElementById("mRand").onclick = startRandom;
+  document.getElementById("mAll").onclick = startAll;
+  document.getElementById("mExam").onclick = () => startExam();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- tryb 1: losowy ---------- */
+function startRandom() {
+  let bag = [];
+  let last = -1;
+  let ok = 0, n = 0;
+  function nextId() {
+    if (!bag.length) {
+      bag = shuffle(Q.map((_, i) => i));
+      if (bag[bag.length - 1] === last && bag.length > 1) [bag[0], bag[bag.length - 1]] = [bag[bag.length - 1], bag[0]];
+    }
+    return (last = bag.pop());
+  }
+  function render() {
+    const item = { id: nextId(), order: shuffle([0, 1, 2]) };
+    let answered = false;
+    app.innerHTML = header("Losowe pytania", "") + questionHTML(item, `Pytanie ${n + 1}`);
+    bindHome();
+    updStat();
+    const card = app.querySelector(".card");
+    function answer(i) {
+      if (answered) return;
+      answered = true;
+      const good = i === correctPos(item);
+      n++; if (good) ok++;
+      const g = store.get("randStats", { ok: 0, n: 0 });
+      store.set("randStats", { ok: g.ok + (good ? 1 : 0), n: g.n + 1 });
+      paintResult(card, item, i);
+      const v = document.getElementById("verdict");
+      v.className = "verdict " + (good ? "ok" : "bad");
+      v.textContent = good ? "✓ Dobrze!" : `✗ Źle. Poprawna odpowiedź: ${LETTERS[correctPos(item)]}`;
+      updStat();
+      document.getElementById("next").disabled = false;
+    }
+    card.querySelectorAll(".ans").forEach(b => b.onclick = () => answer(+b.dataset.i));
+    setBar(`<span class="stat" id="stat"></span><button class="btn primary" id="next" disabled>Następne pytanie →</button>`);
+    updStat();
+    document.getElementById("next").onclick = () => { render(); window.scrollTo(0, 0); };
+    keyHandler = e => {
+      const i = keyToIndex(e);
+      if (i >= 0 && !answered) { e.preventDefault(); answer(i); }
+      else if ((e.key === "Enter" || e.key === " ") && answered) { e.preventDefault(); render(); window.scrollTo(0, 0); }
+    };
+  }
+  function updStat() {
+    const s = document.getElementById("stat");
+    if (s) s.innerHTML = `<b class="ok">${ok}</b> / ${n}` + (n ? ` · ${Math.round(100 * ok / n)}%` : "");
+  }
+  render();
+}
+
+/* ---------- tryb 2: wszystkie po kolei ---------- */
+function startAll() {
+  let st = store.get("all", null);
+  if (!st || st.pos >= Q.length || !Array.isArray(st.res) || st.res.length !== Q.length) {
+    st = { pos: 0, res: Array(Q.length).fill(null) }; // res[i] = indeks wybranej (w kolejności kanonicznej) lub null
+  }
+  const save = () => store.set("all", st);
+  function render() {
+    const id = st.pos;
+    const item = { id, order: [0, 1, 2] };
+    const done = st.res.filter(r => r !== null).length;
+    app.innerHTML = header("Wszystkie pytania", `${id + 1} / ${Q.length}`)
+      + `<div class="progress"><div style="width:${(100 * done / Q.length).toFixed(1)}%"></div></div>`
+      + questionHTML(item, `Pytanie ${id + 1} z ${Q.length}`);
+    bindHome();
+    const card = app.querySelector(".card");
+    const v = document.getElementById("verdict");
+    function show(i) {
+      paintResult(card, item, i);
+      const good = i === correctPos(item);
+      v.className = "verdict " + (good ? "ok" : "bad");
+      v.textContent = good ? "✓ Dobrze!" : `✗ Źle. Poprawna odpowiedź: ${LETTERS[correctPos(item)]}`;
+    }
+    function answer(i) {
+      if (st.res[id] !== null) return;
+      st.res[id] = i; save();
+      show(i);
+      render.stat();
+    }
+    if (st.res[id] !== null) show(st.res[id]);
+    card.querySelectorAll(".ans").forEach(b => b.onclick = () => answer(+b.dataset.i));
+    const last = id === Q.length - 1;
+    setBar(`<button class="btn" id="prev" ${id === 0 ? "disabled" : ""}>←</button>
+      <span class="stat" id="stat"></span>
+      <button class="btn primary" id="next">${last ? "Zakończ" : "Dalej →"}</button>`);
+    render.stat = () => {
+      const d = st.res.filter(r => r !== null).length;
+      const o = st.res.filter((r, i) => r !== null && r === Q[i].c).length;
+      document.getElementById("stat").innerHTML = `<b class="ok">${o}</b> / ${d}`;
+    };
+    render.stat();
+    const go = d => { st.pos = id + d; save(); render(); window.scrollTo(0, 0); };
+    document.getElementById("prev").onclick = () => { if (id > 0) go(-1); };
+    document.getElementById("next").onclick = () => last ? finish() : go(1);
+    keyHandler = e => {
+      const i = keyToIndex(e);
+      if (i >= 0 && st.res[id] === null) { e.preventDefault(); answer(i); }
+      else if (e.key === "Enter") { e.preventDefault(); last ? finish() : go(1); }
+      else if (e.key === "ArrowRight" && !last) go(1);
+      else if (e.key === "ArrowLeft" && id > 0) go(-1);
+    };
+  }
+  function finish() {
+    const items = Q.map((_, i) => ({ id: i, order: [0, 1, 2] }));
+    const chosen = st.res.slice();
+    store.del("all");
+    showResult("Wszystkie pytania", items, chosen, startAll);
+  }
+  render();
+}
+
+/* ---------- tryb 3: egzamin ---------- */
+function startExam(setNr) {
+  const nr = setNr || SET_IDS[Math.floor(Math.random() * SET_IDS.length)];
+  const items = SETS[nr].map(([id, perm]) => ({ id, order: perm.split("").map(Number) }));
+  const chosen = Array(items.length).fill(null);
+  let pos = 0;
+  function render() {
+    const item = items[pos];
+    const answered = chosen.filter(c => c !== null).length;
+    app.innerHTML = header(`Egzamin · zestaw ${nr}`, `${pos + 1} / ${items.length}`)
+      + `<div class="progress"><div style="width:${100 * answered / items.length}%"></div></div>`
+      + questionHTML(item, `Pytanie ${pos + 1} z ${items.length}`);
+    bindHome("Przerwać egzamin? Odpowiedzi nie zostaną zapisane.");
+    const card = app.querySelector(".card");
+    const btns = card.querySelectorAll(".ans");
+    const mark = () => btns.forEach((b, i) => b.classList.toggle("sel", chosen[pos] === i));
+    mark();
+    function pick(i) {
+      chosen[pos] = i; mark();
+      app.querySelector(".progress > div").style.width = (100 * chosen.filter(c => c !== null).length / items.length) + "%";
+      document.getElementById("next").disabled = false;
+    }
+    btns.forEach(b => b.onclick = () => pick(+b.dataset.i));
+    const last = pos === items.length - 1;
+    setBar(`<button class="btn" id="prev" ${pos === 0 ? "disabled" : ""}>←</button>
+      <button class="btn primary" id="next" ${chosen[pos] === null ? "disabled" : ""}>${last ? "Zakończ egzamin" : "Dalej →"}</button>`);
+    const go = d => { pos += d; render(); window.scrollTo(0, 0); };
+    const next = () => {
+      if (chosen[pos] === null) return;
+      if (!last) return go(1);
+      const missing = chosen.findIndex(c => c === null);
+      if (missing >= 0) { pos = missing; render(); return; }
+      showResult(`Egzamin · zestaw ${nr}`, items, chosen, () => startExam(), nr);
+    };
+    document.getElementById("prev").onclick = () => { if (pos > 0) go(-1); };
+    document.getElementById("next").onclick = next;
+    keyHandler = e => {
+      const i = keyToIndex(e);
+      if (i >= 0) { e.preventDefault(); pick(i); }
+      else if (e.key === "Enter") { e.preventDefault(); next(); }
+      else if (e.key === "ArrowLeft" && pos > 0) go(-1);
+      else if (e.key === "ArrowRight" && !last && chosen[pos] !== null) go(1);
+    };
+  }
+  render();
+}
+
+/* ---------- wynik ---------- */
+function showResult(title, items, chosen, again, examNr) {
+  keyHandler = null;
+  const answeredIdx = items.map((_, i) => i).filter(i => chosen[i] !== null);
+  const okIdx = answeredIdx.filter(i => chosen[i] === correctPos(items[i]));
+  const total = examNr ? items.length : answeredIdx.length;
+  const pct = total ? Math.round(100 * okIdx.length / total) : 0;
+  const wrong = answeredIdx.filter(i => chosen[i] !== correctPos(items[i]));
+  const reviewIdx = examNr ? items.map((_, i) => i) : wrong;
+
+  app.innerHTML = header(title, "") + `
+    <div class="card result">
+      <div>Twój wynik</div>
+      <div class="big ${pct >= 80 ? "ok" : "bad"}">${okIdx.length} / ${total}</div>
+      <p>${pct}% poprawnych odpowiedzi${!examNr && answeredIdx.length < items.length ? ` · pominięto ${items.length - answeredIdx.length}` : ""}</p>
+      ${examNr ? `<div class="picker" style="justify-content:center">
+        <label for="setSel">Inny zestaw:</label>
+        <select id="setSel">${SET_IDS.map(s => `<option value="${s}" ${s === examNr ? "selected" : ""}>Nr ${s}</option>`).join("")}</select>
+        <button class="btn" id="goSet">Start</button></div>` : ""}
+    </div>
+    <div class="review">
+      <h2>${examNr ? "Przegląd odpowiedzi" : (wrong.length ? `Błędne odpowiedzi (${wrong.length})` : "Bez błędów – brawo!")}</h2>
+      ${reviewIdx.map(i => {
+        const item = items[i], q = Q[item.id], cp = correctPos(item), ch = chosen[i];
+        const good = ch === cp;
+        return `<div class="card">
+          <div class="qmeta">Pytanie ${i + 1}<span class="tag ${good ? "ok" : "bad"}">${good ? "dobrze" : "źle"}</span></div>
+          <p class="qtext">${esc(q.q)}</p>
+          <div class="answers">${item.order.map((ai, j) =>
+            `<div class="ans ${j === cp ? "ok" : j === ch ? "bad" : "dim"}"><span class="letter">${LETTERS[j]}</span><span class="txt">${esc(q.a[ai])}</span></div>`).join("")}</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+  bindHome();
+  if (examNr) document.getElementById("goSet").onclick = () => startExam(document.getElementById("setSel").value);
+  setBar(`<button class="btn" id="menu2">Menu</button><button class="btn primary" id="again">${examNr ? "Nowy losowy egzamin" : "Zacznij od nowa"}</button>`);
+  document.getElementById("menu2").onclick = showMenu;
+  document.getElementById("again").onclick = again;
+  window.scrollTo(0, 0);
+}
+
+showMenu();
+</script>
+</body>
+</html>
